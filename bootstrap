@@ -1,8 +1,9 @@
 #!/bin/sh
+set -x
 set -e
 
 if [ -f /etc/debian_version ]; then
-    for package in python3-pip python3-virtualenv python3-dev libevent-dev libxml2-dev libxslt-dev zlib1g-dev; do
+    for package in python3-pip python3-virtualenv python3-dev libevent-dev libxml2-dev libxslt-dev zlib1g-dev libffi-dev python3-cffi python3-pycparser python3-cachecontrol; do
         if [ "$(dpkg --status -- $package 2>/dev/null|sed -n 's/^Status: //p')" != "install ok installed" ]; then
             # add a space after old values
             missing="${missing:+$missing }$package"
@@ -25,7 +26,8 @@ if [ -f /etc/redhat-release ]; then
     fi
 fi
 
-virtualenv -p python3 --system-site-packages --distribute virtualenv
+sudo pip3 install --upgrade --trusted-host apt-mirror.front.sepia.ceph.com  setuptools cffi cachecontrol # address pip issue: https://github.com/pypa/pip/issues/6264
+virtualenv -p python3 --system-site-packages --download --distribute virtualenv
 
 # avoid pip bugs
 ./virtualenv/bin/pip install --upgrade pip
