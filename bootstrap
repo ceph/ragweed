@@ -27,7 +27,7 @@ if [ -f /etc/redhat-release ]; then
 fi
 
 sudo pip3 install --upgrade --trusted-host apt-mirror.front.sepia.ceph.com  setuptools cffi cachecontrol # address pip issue: https://github.com/pypa/pip/issues/6264
-virtualenv -p python3 --system-site-packages --download --distribute virtualenv
+virtualenv -p python3 --system-site-packages --download virtualenv
 
 # avoid pip bugs
 ./virtualenv/bin/pip install --upgrade pip
