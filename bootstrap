@@ -35,7 +35,7 @@ virtualenv -p python3 --system-site-packages --download virtualenv
 
 # work-around change in pip 1.5
 ./virtualenv/bin/pip install six
-./virtualenv/bin/pip install -I nose
+./virtualenv/bin/pip install -U pytest
 ./virtualenv/bin/pip install setuptools
 
 ./virtualenv/bin/pip install -U -r requirements.txt

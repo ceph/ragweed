@@ -15,6 +15,8 @@ import rados
 
 from .reqs import _make_admin_request
 
+import pytest
+
 ragweed_env = None
 suite = None
 
@@ -287,7 +289,7 @@ class RZone:
 
 
 class RTest:
-    def __init__(self):
+    def setup_method(self):
         self._name = self.__class__.__name__
         self.r_buckets = []
         self.init()
@@ -445,6 +447,7 @@ class RagweedEnv:
                 'ceph_conf is missing under the [rados] section in ' + os.environ['RAGWEED_CONF']
                 )
 
+        print('conf=' + str(self.ceph_conf))
         self.rados = rados.Rados(conffile=self.ceph_conf)
         self.rados.connect()
 
@@ -459,3 +462,8 @@ def setup_module():
 
     ragweed_env = RagweedEnv()
     suite = ragweed_env.suite
+
+@pytest.fixture(scope="package", autouse=True)
+def setup_teardown():
+    setup_module()
+    yield

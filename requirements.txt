@@ -1,5 +1,5 @@
 PyYAML
-nose >=1.0.0
+pytest
 boto >=2.6.0, != 2.46.0
 munch >=1.0.0
 gevent >=1.0
