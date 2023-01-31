@@ -51,7 +51,7 @@ def validate_obj_location(rbucket, obj):
 
     head_placement = get_placement(obj_layout.head)
 
-    eq(head_placement.pool, expected_head_pool)
+    assert head_placement.pool == expected_head_pool
 
     # check rados object for head exists
     head_pool_ioctx.set_locator_key(head_placement.loc)
@@ -65,10 +65,10 @@ def validate_obj_location(rbucket, obj):
         print('ofs=', o.ofs, 'loc', o.loc)
         placement = get_placement(o.loc)
         if o.ofs < obj_layout.manifest.head_size:
-            eq(placement.pool, expected_head_pool)
+            assert placement.pool == expected_head_pool
             pool_ioctx = head_pool_ioctx
         else:
-            eq(placement.pool, expected_tail_pool)
+            assert placement.pool == expected_tail_pool
             pool_ioctx = tail_pool_ioctx
 
         # validate rados object exists
@@ -83,7 +83,7 @@ def validate_obj_location(rbucket, obj):
 
         check_size = o.loc_ofs + o.loc_size
 
-        eq(size, check_size)
+        assert size == check_size
 
 def calc_crc(data):
     crc = binascii.crc32(data)
@@ -97,7 +97,7 @@ def validate_obj(rbucket, obj_name, expected_crc):
 
     validate_obj_location(rbucket, obj)
     obj_crc = calc_crc(obj.get_contents_as_string())
-    eq(obj_crc, expected_crc)
+    assert obj_crc == expected_crc
 
 
 def generate_random(size):
@@ -156,7 +156,7 @@ class r_test_small_obj_data(RTest):
                 obj = Key(rbucket.bucket)
                 obj.key = n;
                 obj_data = obj.get_contents_as_string()
-                eq(bytearray(data, 'utf-8'), obj_data)
+                assert bytearray(data, 'utf-8') == obj_data
 
                 validate_obj_location(rbucket, obj)
 
@@ -266,7 +266,7 @@ class r_test_multipart_simple(RTest):
             break
 
         k = rb.bucket.get_key(self.r_obj)
-        eq(k.size, self.obj_size)
+        assert k.size == self.obj_size
 
         validate_obj(rb, self.r_obj, self.r_crc)
 
@@ -296,7 +296,7 @@ class r_test_multipart_index_versioning(RTest):
         index_check_result = rgwa().check_bucket_index(rb.name)
         print(index_check_result)
 
-        eq(0, len(index_check_result))
+        assert len(index_check_result) == 0
 
 
 # prepare:
@@ -334,7 +334,7 @@ class r_test_multipart_defer_complete(RTest):
         print('written crc: ' + crc)
 
         k = rb.bucket.get_key(self.r_obj)
-        eq(k.size, self.obj_size)
+        assert k.size == self.obj_size
 
         validate_obj(rb, self.r_obj, crc)
 
@@ -358,7 +358,7 @@ class r_test_multipart_defer_update_complete(RTest):
 
         uploader.prepare()
         ret = uploader.upload() # only upload one part
-        eq(ret, True)
+        assert ret == True
 
         self.r_upload_state = uploader.get_state()
 
@@ -376,7 +376,7 @@ class r_test_multipart_defer_update_complete(RTest):
         print('written crc: ' + crc)
 
         k = rb.bucket.get_key(self.r_obj)
-        eq(k.size, self.obj_size)
+        assert k.size == self.obj_size
 
         validate_obj(rb, self.r_obj, crc)
 
@@ -424,8 +424,8 @@ class r_test_obj_storage_class(RTest):
 
         for obj_info in self.r_objs:
             k = rb.bucket.get_key(obj_info.name)
-            eq(k.size, obj_info.obj_size)
-            eq(k.storage_class, obj_info.storage_class)
+            assert k.size == obj_info.obj_size
+            assert k.storage_class == obj_info.storage_class
 
 
             validate_obj(rb, obj_info.name, obj_info.crc)
@@ -478,8 +478,8 @@ class r_test_obj_storage_class_multipart(RTest):
             print('written crc: ' + crc)
 
             k = rb.bucket.get_key(obj_info.name)
-            eq(k.size, self.obj_size)
-            eq(k.storage_class, obj_info.storage_class)
+            assert k.size == self.obj_size
+            assert k.storage_class == obj_info.storage_class
 
             validate_obj(rb, obj_info.name, crc)
 
@@ -535,8 +535,8 @@ class r_test_obj_storage_class_copy(RTest):
 
         for obj_info in self.r_objs:
             k = rb.bucket.get_key(obj_info.name)
-            eq(k.size, obj_info.obj_size)
-            eq(k.storage_class, obj_info.storage_class)
+            assert k.size == obj_info.obj_size
+            assert k.storage_class == obj_info.storage_class
 
             print('validate', obj_info.name)
 
@@ -594,8 +594,8 @@ class r_test_obj_storage_class_multipart_copy(RTest):
 
         for obj_info in self.r_objs:
             k = rb.bucket.get_key(obj_info.name)
-            eq(k.size, obj_info.obj_size)
-            eq(k.storage_class, obj_info.storage_class)
+            assert k.size == obj_info.obj_size
+            assert k.storage_class == obj_info.storage_class
 
             print('validate', obj_info.name)
 

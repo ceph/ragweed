@@ -9,8 +9,6 @@ import munch
 import yaml
 import configparser
 from boto.s3.key import Key
-from nose.plugins.attrib import attr
-from nose.tools import eq_ as eq
 import rados
 
 from .reqs import _make_admin_request
@@ -209,14 +207,9 @@ class RStorageClasses:
 
     def get(self, storage_class):
         assert(self.storage_classes != None)
-        try:
-            if not storage_class:
-                storage_class = 'STANDARD'
-            sc = self.storage_classes[storage_class]
-        except:
-            eq('could not find storage class ' + storage_class, 0)
-
-        return sc
+        if not storage_class:
+            storage_class = 'STANDARD'
+        return self.storage_classes[storage_class] # may raise KeyError
 
     def get_all(self):
         for (name, _) in self.storage_classes.items():
