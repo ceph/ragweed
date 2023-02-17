@@ -382,7 +382,7 @@ class RagweedEnv:
                 + 'variable RAGWEED_CONF to a config file.',
                 )
         with open(path, 'r') as f:
-            cfg.readfp(f)
+            cfg.read_file(f)
 
         for section in cfg.sections():
             try:
