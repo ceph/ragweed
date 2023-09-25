@@ -296,7 +296,7 @@ class r_test_multipart_index_versioning(RTest):
         index_check_result = rgwa().check_bucket_index(rb.name)
         print(index_check_result)
 
-        assert len(index_check_result) == 0
+        assert len(index_check_result.invalid_multipart_entries) == 0
 
 
 # prepare:
