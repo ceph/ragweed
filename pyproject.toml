@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ragweed"
+version = "0.0.1"
+authors = [
+  { name = "Yehuda Sadeh", email = "yehuda@redhat.com" },
+]
+description = "A test suite for ceph rgw"
+license = { file = "LICENSE" }
+keywords = ["ceph", "rgw", "testing"]
+readme = "README.rst"
+dependencies = [
+  "boto",
+  "PyYAML",
+  "munch",
+  "gevent",
+  "isodate",
+]
