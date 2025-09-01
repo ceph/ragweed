@@ -13,7 +13,7 @@ license = { file = "LICENSE" }
 keywords = ["ceph", "rgw", "testing"]
 readme = "README.rst"
 dependencies = [
-  "boto",
+  "boto3",
   "PyYAML",
   "munch",
   "gevent",
