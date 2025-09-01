@@ -1,4 +1,4 @@
-import boto.s3.connection
+import botocore.exceptions
 from http.client import HTTPConnection, HTTPSConnection
 from urllib.parse import urlparse, urlencode
 
@@ -13,20 +13,49 @@ def _make_admin_request(conn, method, path, query_dict=None, body=None, response
     if query_dict is not None:
         query = urlencode(query_dict)
 
-    (bucket_str, key_str) = path.split('/', 2)[1:]
-    bucket = conn.get_bucket(bucket_str, validate=False)
-    key = bucket.get_key(key_str, validate=False)
-
-    urlobj = None
-    if key is not None:
-        urlobj = key
-    elif bucket is not None:
-        urlobj = bucket
+    # For boto3, we need to generate URLs differently
+    # Split path to get bucket and key components
+    path_parts = path.split('/', 2)
+    if len(path_parts) >= 2:
+        bucket_str = path_parts[1]
     else:
-        raise RuntimeError('Unable to find bucket name')
-    url = urlobj.generate_url(expires_in, method=method, response_headers=response_headers, headers=request_headers)
+        bucket_str = ''
+    
+    if len(path_parts) >= 3:
+        key_str = path_parts[2]
+    else:
+        key_str = ''
+
+    # Generate presigned URL using boto3 client
+    try:
+        if key_str:
+            # Object-level request
+            url = conn.client.generate_presigned_url(
+                'get_object',
+                Params={'Bucket': bucket_str, 'Key': key_str},
+                ExpiresIn=expires_in,
+                HttpMethod=method
+            )
+        else:
+            # Bucket-level request
+            url = conn.client.generate_presigned_url(
+                'list_objects_v2',
+                Params={'Bucket': bucket_str},
+                ExpiresIn=expires_in,
+                HttpMethod=method
+            )
+    except Exception:
+        # Fallback for admin API paths that don't map to standard S3 operations
+        protocol = 'https' if conn.is_secure else 'http'
+        base_url = f"{protocol}://{conn.host}:{conn.port}" if conn.port else f"{protocol}://{conn.host}"
+        url = base_url + path
+        if query:
+            url += '?' + query
+        # For admin requests, we still need to use the raw request method
+        return _make_raw_request(host=conn.host, port=conn.port, method=method, path=path + ('?' + query if query else ''), body=body, request_headers=request_headers, secure=conn.is_secure, timeout=timeout)
+
     o = urlparse(url)
-    req_path = o.path + '?' + o.query + '&' + query
+    req_path = o.path + '?' + o.query + ('&' + query if query else '')
 
     return _make_raw_request(host=conn.host, port=conn.port, method=method, path=req_path, body=body, request_headers=request_headers, secure=conn.is_secure, timeout=timeout)
 

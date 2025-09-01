@@ -13,7 +13,7 @@ setup(
     keywords='ceph rgw testing',
 
     install_requires=[
-        'boto >=2.0b4',
+        'boto3',
         'PyYAML',
         'munch >=1.0.0',
         'gevent >=1.0',
